@@ -1,26 +1,30 @@
-### Create docker images: 
-    To create docker images just need to make changes to the code and push to the repo. 
-    The codebuild will trigger automatically upon change and create a new image and push the image to ECR repo on aws.
+## How to deploy:
+### Step 1: Config DB. <br />
+1. Set up Bitnami Repo
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+```
+2. Creating a PersistentVolume (PV) and a PersistentVolumeClaim (PVC)
+```bash
+kubectl postgres-storage.yaml
+```  
+3. Install Helm Postgres Chart into cluster.
+```bash
+helm install co-working -f value.yaml bitnami/postgresql --set volumePermissions.enabled=true
+```
+### Step 2: Create a Dockerfile for the Python application and build codeBuild to create and push image into AWS ECR. <br />
+    Create a CodeBuild project to connect with the repository and build the Image into AWS ECR and configure it to trigger a build each time there is a merge in the repo
 
-### Create node group:
-    Create new node group
+### Step 3: Create a service and deployment using Kubernetes configuration files to deploy the application. <br />
+1. Create a service and deployment yaml file
+2. Apply configMap, secret, application deployment, application service into cluster
+```bash
+kubectl apply -f deployments/
+``` 
 
-### Create cluster:
-    Create new cluster
+### Step 4: Verify. <br />
+```bash
+kubectl get pods
+``` 
 
-### Configure a Database
-    Create postgres database using a Helm Chart
 
-### Configure a Database
-    Create postgres database using a Helm Chart
-
-### Write service and deployment yaml file
-    After that get the password of the db and put into secret.yaml fil
-    Write analytics-service.yaml
-    Write analytics-deployment.yaml
-
-### Deploy
-    Run kubectl apply -f deployment/
-
-### Verify
-    Use kubectl get pods to make sure the pods is running and it is ready
